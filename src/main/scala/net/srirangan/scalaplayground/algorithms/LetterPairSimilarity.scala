@@ -14,7 +14,7 @@ object LetterPairSimilarity {
     val union = pairs1.length + pairs2.length
     pairs1.foreach((pair1: String) => {
       pairs2.foreach((pair2: String) => {
-        if (pair1.toLowerCase == pair2.toLowerCase) {
+        if (pair1 == pair2) {
           intersection += 1
           pairs2 diff pair2
         }

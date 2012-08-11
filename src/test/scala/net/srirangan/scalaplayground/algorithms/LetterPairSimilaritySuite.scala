@@ -11,12 +11,12 @@ class LetterPairSimilaritySuite extends FunSuite with BeforeAndAfter {
 
   test("'French Republic' and 'Republic of France'") {
     val score: Double = LetterPairSimilarity.compareStrings("French Republic", "Republic of France")
-    assert(score === 0.8)
+    assert(score === 0.72)
   }
 
   test("'French Republic' and 'Republic of Cuba'") {
     val score: Double = LetterPairSimilarity.compareStrings("French Republic", "Republic of Cuba")
-    assert(score === 0.782608695652174)
+    assert(score === 0.6956521739130435)
   }
 
 }
