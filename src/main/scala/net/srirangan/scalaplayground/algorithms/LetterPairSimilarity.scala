@@ -1,3 +1,5 @@
+package net.srirangan.scalaplayground.algorithms
+
 /**
  * An implementation of a string similarity algorithm using the LetterPairSimilarity method.
  * Based on Simon White's work at http://www.catalysoft.com/articles/StrikeAMatch.html

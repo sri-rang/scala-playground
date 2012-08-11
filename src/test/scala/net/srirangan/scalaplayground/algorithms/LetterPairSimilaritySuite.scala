@@ -1,4 +1,6 @@
-import org.scalatest.{Ignore, FunSuite, BeforeAndAfter}
+package net.srirangan.scalaplayground.algorithms
+
+import org.scalatest.{FunSuite, BeforeAndAfter}
 
 class LetterPairSimilaritySuite extends FunSuite with BeforeAndAfter {
 
