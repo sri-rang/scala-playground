@@ -2,10 +2,12 @@
 
 package net.srirangan.scalaplayground.futures
 
-// Import future, maps, for, ExecutionContent
+// import future, maps, for, ExecutionContent
+
 import scala.concurrent._
 
-// futures will spawn threads in the global context's thread pool
+// futures will spawn threads in the global context thread pool
+
 import ExecutionContext.Implicits.global
 
 import scala.util.Random
@@ -14,8 +16,6 @@ object Main extends App {
 
   // `future` blocks asynchronously execute in a different thread and return a `val`
   // asynchronous results can be trapped via `onSuccess`, `onFailure` and `onComplete` callbacks
-
-  Console.println("Waiting..")
 
   val sayHello = future {
     Thread.sleep(1000)
@@ -26,9 +26,9 @@ object Main extends App {
     case message => Console.println(s"He said '$message'")
   }
 
-  Thread.sleep(2000)
+  Console.println("Waiting..")
 
-  Console.println("Try dividing by zero")
+  Thread.sleep(2000)
 
   val tryDivideByZero = future {
     Thread.sleep(1000)
@@ -38,6 +38,8 @@ object Main extends App {
   tryDivideByZero onFailure {
     case e: ArithmeticException => Console.println(s"Don't be silly!")
   }
+
+  Console.println("Try dividing by zero..")
 
   Thread.sleep(2000)
 
@@ -84,7 +86,6 @@ object Main extends App {
     yourScore <- calculateYourScore
   } yield myScore > yourScore
 
-
   doIWin onSuccess {
     case b: Boolean => Console.println(if (b) "yes" else "no")
   }
@@ -92,5 +93,116 @@ object Main extends App {
   Console.println("Do I win?")
 
   Thread.sleep(2000)
+
+  // Sometimes we need recover from an exception with a value
+  // lets `recover` from an exception with a fallback val 'Infinity'
+
+  val tryDivideByZeroAgain = future {
+    Thread.sleep(1000)
+    1 / 0
+  } recover {
+    case e: ArithmeticException => "Infinity"
+  }
+
+  tryDivideByZeroAgain onSuccess {
+    case e => Console.println(e)
+  }
+
+  tryDivideByZeroAgain onFailure {
+    case e => Console.println(e)
+  }
+
+  Console.println("Try dividing by zero, recover from exception..")
+
+  Thread.sleep(2000)
+
+  // Or maybe future f1 must fallback to future f2?
+
+  val f1 = future {
+    Thread.sleep(500)
+    1 / 0
+  }
+
+  val f2 = future {
+    Thread.sleep(500)
+    "Infinity"
+  }
+
+  f1 fallbackTo f2 onSuccess {
+    case v => Console.println(v)
+  }
+
+  Console.println("Try dividing by zero, fallback to another future..")
+
+  Thread.sleep(2000)
+
+  // the for {} construct lets us execute multiple futures in parallel
+  // to serially execute futures in specific orders, we use `andThen`
+  // andThen ensures execution orders in what would otherwise be random
+
+  val whamBamThankYouMaam = future {
+    Thread.sleep(500)
+    Console.println("Wham!")
+  } andThen {
+    case _ => {
+      Thread.sleep(500)
+      Console.println("Bam!")
+    }
+  } andThen {
+    case _ => {
+      Thread.sleep(500)
+      Console.println("Thank you ma'am!")
+    }
+  }
+
+  Console.println("Will you score?")
+
+  Thread.sleep(2000)
+
+  // `promises` can be used to compose type safe futures
+
+  val willYouMarryMe = promise[Boolean]
+
+  willYouMarryMe.future onSuccess {
+    case yes => Console.println("Yes! :D")
+  }
+
+  willYouMarryMe.future onFailure {
+    case no => Console.println("No :(")
+  }
+
+  future {
+    Thread.sleep(1000)
+    if (new Random().nextBoolean())
+      willYouMarryMe success true // type safe, try passing non boolean value here and compile
+    else
+      willYouMarryMe failure new Exception
+  }
+
+  Console.println("Will you marry me?")
+
+  Thread.sleep(2000)
+
+  // Two asynchronous blocks `tryComplete` a promise
+
+  val whoWonTheRace = promise[String]
+
+  whoWonTheRace.future onSuccess {
+    case name => Console.println(name + " wins")
+  }
+
+  future {
+    Thread.sleep(new Random().nextInt(500))
+    whoWonTheRace trySuccess "x"
+  }
+
+  future {
+    Thread.sleep(new Random().nextInt(500))
+    whoWonTheRace trySuccess "y"
+  }
+
+  Console.println("Who won the race?")
+
+  Thread.sleep(1000)
 
 }
