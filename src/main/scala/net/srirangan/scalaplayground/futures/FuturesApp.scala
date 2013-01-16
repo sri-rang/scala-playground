@@ -12,7 +12,7 @@ import ExecutionContext.Implicits.global
 
 import scala.util.Random
 
-object Futures extends App {
+object FuturesApp extends App {
 
   // `future` blocks asynchronously execute in a different thread and return a `val`
   // asynchronous results can be trapped via `onSuccess`, `onFailure` and `onComplete` callbacks
